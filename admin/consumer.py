@@ -1,12 +1,21 @@
 # this is the consumer file which will consume the messages from the queue and process them accordingly.
 import pika, json, os, django
 
+from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# BASE_DIR = Path(__file__).resolve().parent.parent
+# load_dotenv(BASE_DIR / '.env')
+load_dotenv()
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "admin.settings")
 django.setup()
 
 from products.models import Product
 
-params =  pika.URLParameters('amqps://mpvhpugc:XsdQm-Hn1AbBSPZv8Bsw9SC0I7XaX8nr@warthog.lmq.cloudamqp.com/mpvhpugc')
+rabbit_url = os.getenv("CLOUDAMQP_URL")
+params =  pika.URLParameters(str(os.getenv("CLOUDAMQP_URL")))
 
 
 connection = pika.BlockingConnection(params)

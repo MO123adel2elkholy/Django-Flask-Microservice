@@ -1,7 +1,15 @@
 # this will prodcue the evetnts from admin service(Django) to the RabbitMQ and then the events will be consumed by the Flask microservice to update the database accordingly.
 import pika, json
 
-params = pika.URLParameters('amqps://mpvhpugc:XsdQm-Hn1AbBSPZv8Bsw9SC0I7XaX8nr@warthog.lmq.cloudamqp.com/mpvhpugc')
+from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
+
+rabbit_url = os.getenv("CLOUDAMQP_URL")
+params = pika.URLParameters(str(rabbit_url))
 
 def publish(message):
     connection = pika.BlockingConnection(params)
@@ -13,6 +21,6 @@ def publish(message):
 
 
 if __name__ == '__main__':
-    publish({"id": 1})
+    publish({"id": 2})
 
 print("Start producing ")

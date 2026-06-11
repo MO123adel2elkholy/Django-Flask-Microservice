@@ -12,7 +12,7 @@ class ProductViewSet(viewsets.ViewSet):
     def list(self, request):
         try:
             products = Product.objects.all()
-            publish({"id":2})
+            publish({"id":4})
             serializer = ProductSerializer(products, many=True)
             return Response({'success': True, 'data': serializer.data})
         except Exception as e:
