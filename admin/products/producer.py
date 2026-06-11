@@ -14,9 +14,9 @@ params = pika.URLParameters(str(rabbit_url))
 def publish(message):
     connection = pika.BlockingConnection(params)
     channel = connection.channel()
-    channel.queue_declare(queue='admin')
+    channel.queue_declare(queue='main')
     props = pika.BasicProperties(content_type='application/json')
-    channel.basic_publish(exchange='', routing_key='admin', body=json.dumps(message), properties=props)
+    channel.basic_publish(exchange='', routing_key='main', body=json.dumps(message), properties=props)
     connection.close()
 
 
