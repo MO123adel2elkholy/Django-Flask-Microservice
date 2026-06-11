@@ -6,12 +6,13 @@ from .serializers import ProductSerializer
 import random
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-
+from .producer import publish
 
 class ProductViewSet(viewsets.ViewSet):
     def list(self, request):
         try:
             products = Product.objects.all()
+            publish({"id":2})
             serializer = ProductSerializer(products, many=True)
             return Response({'success': True, 'data': serializer.data})
         except Exception as e:
