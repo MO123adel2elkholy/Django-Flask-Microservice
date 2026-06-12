@@ -12,8 +12,8 @@ class ProductViewSet(viewsets.ViewSet):
     def list(self, request):
         try:
             products = Product.objects.all()
-            publish({"id":4})
             serializer = ProductSerializer(products, many=True)
+            publish("show_products",serializer.data )
             return Response({'success': True, 'data': serializer.data})
         except Exception as e:
             return Response({'success': False, 'message': 'Failed to retrieve products', 'error': str(e)},
@@ -26,6 +26,7 @@ class ProductViewSet(viewsets.ViewSet):
                 return Response({'success': False, 'message': 'Validation error', 'errors': serializer.errors},
                                 status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
+            publish("product_created", serializer.data)
             return Response({'success': True, 'data': serializer.data}, status=status.HTTP_201_CREATED)
         except IntegrityError as e:
             return Response({'success': False, 'message': 'Database integrity error', 'error': str(e)},
@@ -38,6 +39,7 @@ class ProductViewSet(viewsets.ViewSet):
         try:
             product = Product.objects.get(id=pk)
             serializer = ProductSerializer(product)
+            publish("product_retrived", serializer.data)
             return Response({'success': True, 'data': serializer.data})
         except Product.DoesNotExist:
             return Response({'success': False, 'message': f'Product with id {pk} not found'},
@@ -58,6 +60,7 @@ class ProductViewSet(viewsets.ViewSet):
                 return Response({'success': False, 'message': 'Validation error', 'errors': serializer.errors},
                                 status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
+            publish("product_updated", serializer.data)
             return Response({'success': True, 'data': serializer.data}, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response({'success': False, 'message': 'Failed to update product', 'error': str(e)},
@@ -67,6 +70,7 @@ class ProductViewSet(viewsets.ViewSet):
         try:
             product = Product.objects.get(id=pk)
             product.delete()
+            publish("product_deleted", {"id": pk})
             return Response({'success': True, 'message': f'Product with id {pk} deleted'},
                             status=status.HTTP_204_NO_CONTENT)
         except Product.DoesNotExist:
@@ -84,6 +88,7 @@ class UserAPIView(APIView):
             if not users.exists():
                 return Response({'success': False, 'message': 'No users available'}, status=status.HTTP_404_NOT_FOUND)
             user = random.choice(list(users))
+            publish("show_user", user)
             return Response({'success': True, 'id': user.id})
         except Exception as e:
             return Response({'success': False, 'message': 'Failed to fetch a user', 'error': str(e)},
