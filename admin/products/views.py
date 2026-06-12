@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Product, User
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer , UserSerializer
 import random
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -81,15 +81,24 @@ class ProductViewSet(viewsets.ViewSet):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# class UserAPIView(APIView):
+#     def get(self, _):
+#         try:
+#             users = User.objects.all()
+#             if not users.exists():
+#                 return Response({'success': False, 'message': 'No users available'}, status=status.HTTP_404_NOT_FOUND)
+#             user = random.choice(list(users)) 
+#             serializer = UserSerializer(user)
+#             publish("show_user", serializer.data)
+#             return Response({'success': True, 'id': serializer.data})
+#         except Exception as e:
+#             return Response({'success': False, 'message': 'Failed to fetch a user', 'error': str(e)},
+#                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class UserAPIView(APIView):
     def get(self, _):
-        try:
-            users = User.objects.all()
-            if not users.exists():
-                return Response({'success': False, 'message': 'No users available'}, status=status.HTTP_404_NOT_FOUND)
-            user = random.choice(list(users))
-            publish("show_user", user)
-            return Response({'success': True, 'id': user.id})
-        except Exception as e:
-            return Response({'success': False, 'message': 'Failed to fetch a user', 'error': str(e)},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        users = User.objects.all()
+        user = random.choice(users)
+        return Response({
+            'id': user.id
+        })

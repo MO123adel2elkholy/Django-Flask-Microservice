@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.exc import IntegrityError
 import requests
-
+from producer import publish
 
 
 app = Flask(__name__)
@@ -40,6 +40,34 @@ class ProductUser(db.Model):
 @app.route('/api/products')
 def index():
     return jsonify(Product.query.all())
+
+
+
+@app.route('/api/products/<int:id>/like', methods=['POST'])
+def like(id):
+    # USER_SERVICE_URL = os.getenv('USER_SERVICE_URL', 'http://127.0.0.1:8000')
+    try:
+        resp = requests.get(f'http://127.0.0.1:8000/api/user', timeout=5)
+        resp.raise_for_status()
+        user_json = resp.json()
+        print(user_json)
+
+        productUser = ProductUser(user_id=user_json['id'], product_id=id)
+        db.session.add(productUser)
+        db.session.commit()
+
+        publish('product_liked', id)
+    except IntegrityError:
+        db.session.rollback()
+        abort(400, 'You already liked this product')
+    except requests.RequestException:
+        abort(502, 'User service unavailable')
+    except Exception:
+        db.session.rollback()
+        abort(500)
+
+    return jsonify({'message': 'success'})
+
 
 
 
