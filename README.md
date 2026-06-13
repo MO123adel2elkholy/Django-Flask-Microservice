@@ -11,10 +11,15 @@ Small monorepo demonstrating two microservices communicating via RabbitMQ:
 - .env — environment variables (not included; create locally)
 
 ## Prerequisites (Windows)
-- Python 3.8+
+- Python 3.9+ (recommended; Dockerfiles use Python 3.9)
 - pip
-- RabbitMQ (or CloudAMQP)
-- Optional: Docker (to run RabbitMQ locally)
+- venv (built-in) — create virtual env with: py -3 -m venv venv
+- RabbitMQ server (local or CloudAMQP)
+- Optional: Docker & Docker Compose (to run RabbitMQ or services in containers)
+
+Notes:
+- The project uses SQLite by default for local development; docker-compose examples show MySQL if you run containers.
+- Ensure CLOUDAMQP_URL (or your RabbitMQ address) is reachable from both services.
 
 ## Setup (Windows commands)
 1. Create virtual env and install deps:
