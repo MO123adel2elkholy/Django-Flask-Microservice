@@ -4,3 +4,4 @@ venv/
 pycache/
 instance/
 *.pyc
+node_modules/
