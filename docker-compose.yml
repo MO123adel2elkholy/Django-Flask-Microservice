@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  react-frontend:
+    build:
+      context: ./react-crud-main
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
