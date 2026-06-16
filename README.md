@@ -105,3 +105,114 @@ Troubleshooting
 Notes
 - Default DB: SQLite for local development.
 - This project is a demo — do not use DEBUG=True or weak SECRET_KEY in production.
+
+
+
+
+# Django - Flask Microservice (RabbitMQ) + React Frontend (Dockerized)
+
+Monorepo demo: two Python microservices (Django "admin" and Flask "main") communicating via RabbitMQ, with a React + TypeScript frontend served by Nginx in Docker.
+
+What's new
+- The React app (react-crud-main) is dockerized with a multi-stage Node build and served with Nginx.
+- Added docker-compose at repo root to build and run the frontend container.
+- Nginx config proxies /api/ requests to the backend host (config uses host.docker.internal for Windows).
+
+Files added/changed
+- react-crud-main/Dockerfile
+- react-crud-main/nginx/default.conf
+- react-crud-main/.dockerignore
+- docker-compose.yml (repo root)
+- README.md (this file) — updated to include Docker instructions
+
+Quick overview
+- Builder stage uses node:16 to run npm build.
+- Final image uses nginx:stable-alpine and serves /app/build at /usr/share/nginx/html.
+- Nginx config includes SPA fallback (try_files) and an optional /api/ proxy to host.docker.internal:5000 (edit if your backend is elsewhere).
+
+Run with Docker Compose (Windows PowerShell)
+1. Ensure Docker Desktop is running.
+2. From repository root:
+```powershell
+cd f:\Django_Flassk_Microservice\Django-Flask-Microservice
+docker-compose up --build -d
+```
+3. Open the app: http://localhost:3000
+4. View logs:
+```powershell
+docker-compose logs -f react-frontend
+```
+5. Stop and remove containers:
+```powershell
+docker-compose down
+```
+
+Run single container (manual build)
+```powershell
+cd f:\Django_Flassk_Microservice\Django-Flask-Microservice\react-crud-main
+docker build -t react-crud .
+docker run -d -p 3000:80 --name react-crud react-crud
+```
+
+Notes
+- Nginx proxy uses host.docker.internal to reach services running on the Docker host (Windows / Docker Desktop). On Linux, replace proxy_pass with the actual backend container host or use a Docker network and update docker-compose accordingly.
+- If you change react-crud-main/nginx/default.conf, rebuild images: docker-compose up --build -d.
+- For local development use npm start (in react-crud-main) instead of Docker.
+- Port mapping in docker-compose maps container port 80 → host port 3000 (http://localhost:3000).
+
+Troubleshooting
+- If API requests from the container fail, verify the backend is reachable from the host and update the proxy URL in react-crud-main/nginx/default.conf.
+- Ensure .dockerignore excludes node_modules and build to keep images small.
+
+```// filepath: f:\Django_Flassk_Microservice\Django-Flask-Microservice\README.md
+# Django - Flask Microservice (RabbitMQ) + React Frontend (Dockerized)
+
+pp (react-crud-main) is dockerized with a multi-stage Node build and served with Nginx.
+- Added docker-compose at repo root to build and run the frontend container.
+- Nginx config proxies /api/ requests to the backend host (config uses host.docker.internal for Windows).
+
+Files added/changed
+- react-crud-main/Dockerfile
+- react-crud-main/nginx/default.conf
+- react-crud-main/.dockerignore
+- docker-compose.yml (repo root)
+- README.md (this file) — updated to include Docker instructions
+
+Quick overview
+- Builder stage uses node:16 to run npm build.
+- Final image uses nginx:stable-alpine and serves /app/build at /usr/share/nginx/html.
+- Nginx config includes SPA fallback (try_files) and an optional /api/ proxy to host.docker.internal:5000 (edit if your backend is elsewhere).
+
+Run with Docker Compose (Windows PowerShell)
+1. Ensure Docker Desktop is running.
+2. From repository root:
+```powershell
+cd f:\Django_Flassk_Microservice\Django-Flask-Microservice
+docker-compose up --build -d
+```
+3. Open the app: http://localhost:3000
+4. View logs:
+```powershell
+docker-compose logs -f react-frontend
+```
+5. Stop and remove containers:
+```powershell
+docker-compose down
+```
+
+Run single container (manual build)
+```powershell
+cd f:\Django_Flassk_Microservice\Django-Flask-Microservice\react-crud-main
+docker build -t react-crud .
+docker run -d -p 3000:80 --name react-crud react-crud
+```
+
+Notes
+- Nginx proxy uses host.docker.internal to reach services running on the Docker host (Windows / Docker Desktop). On Linux, replace proxy_pass with the actual backend container host or use a Docker network and update docker-compose accordingly.
+- If you change react-crud-main/nginx/default.conf, rebuild images: docker-compose up --build -d.
+- For local development use npm start (in react-crud-main) instead of Docker.
+- Port mapping in docker-compose maps container port 80 → host port 3000 (http://localhost:3000).
+
+Troubleshooting
+- If API requests from the container fail, verify the backend is reachable from the host and update the proxy URL in react-crud-main/nginx/default.conf.
+- Ensure .dockerignore excludes node_modules and build to keep images small.
